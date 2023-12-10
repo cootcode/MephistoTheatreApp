@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<main aria-labelledby="title">
+    <h2 id="title">@ViewBag.Title.</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>MEPHISTO THEATRE.</h4>
+            <hr />
+
+
+            <div style="form-group row pb-2">
+                <img src="~/images/welcometotheshow.png" alt="Left Image" style="width: 350px; height: auto;" />
+            </div>
+            <br />
+            <div class="form-group row pb-2">
+                <div class="col-md-8">
+                    <h2 style="font-weight: bold; font-size: 1.2em;">New Blog System</h2>
+                    <ul style="font-weight: bold; font-size: 1.2em; text-align: left;">
+                        <li>Announcements</li>
+                        <li>Movie Posts</li>
+                        <li>Reviews</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                @Html.ActionLink("DISCOVER", "Index", "Home", null, new { @class = "btn btn-warning", style = "width: 50%; text-align: center; padding: 8px text-decoration: none; color: #000; border: 2px solid #000; background-color: #ffc107; display: inline-block;" })
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="~/images/masks.png" alt="Right Mask image" class="img-fluid" />
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
