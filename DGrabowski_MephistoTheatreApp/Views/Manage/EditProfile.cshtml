@@ -1,0 +1,76 @@
+﻿@model DGrabowski_MephistoTheatreApp.Models.EditProfileViewModel
+
+@{
+    ViewBag.Title = "Edit Profile Details";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@using (Html.BeginForm("UpdateProfile", "Manage", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <!-- Display input fields for editing profile details -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.UserName, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                        </div>
+                    </div>
+
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.Firstname, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Firstname, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.Lastname, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Lastname, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.Street, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Street, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.City, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.Postcode, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Postcode, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row pb-2">
+                        @Html.LabelFor(m => m.Email, new { @class = "col-md-4 col-form-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <!-- Submit button with form submission-->
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <!-- Cancel button without form submission -->
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+                    <img src="~/images/masks.png" alt="masks image" class="img-fluid" />
+                </div>
+            </div>
+        }

@@ -139,4 +139,5 @@ namespace DGrabowski_MephistoTheatreApp.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
+
 }

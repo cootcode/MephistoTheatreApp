@@ -64,13 +64,26 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+            var user = await UserManager.FindByIdAsync(userId);
+
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+
+
+                // Additional user details
+                Role = user.CurrentRole,
+                UserName = user.UserName,
+                Firstname = user.FirstName,
+                Lastname = user.LastName,
+                Street = user.Street,
+                City = user.City,
+                Postcode = user.PostCode,
+                Email = user.Email,
             };
             return View(model);
         }
@@ -276,6 +289,56 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             return View(model);
         }
 
+        public ActionResult EditProfile()
+        {
+            // Retrieve the user details and populate the EditProfileViewModel
+            var userId = User.Identity.GetUserId();
+            var user = UserManager.FindById(userId);
+            var model = new EditProfileViewModel
+            {
+                UserName = user.UserName,
+                Firstname = user.FirstName,
+                Lastname = user.LastName,
+                Street = user.Street,
+                City = user.City,
+                Postcode = user.PostCode,
+                Email = user.Email,
+                // Add other properties as needed
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateProfile(EditProfileViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Retrieve the user
+                var userId = User.Identity.GetUserId();
+                var user = UserManager.FindById(userId);
+
+                // Update user details
+                user.UserName = model.UserName;
+                user.FirstName = model.Firstname;
+                user.LastName = model.Lastname;
+                user.Street = model.Street;
+                user.City = model.City;
+                user.PostCode = model.Postcode;
+                user.Email = model.Email;
+
+                // Save changes to the database
+                UserManager.Update(user);
+
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("Index", "Manage"); // Redirect to the profile page or another appropriate page
+            }
+
+            // If the model state is not valid, return the view with errors
+            return View("EditProfile", model);
+        }
+
         //
         // GET: /Manage/ManageLogins
         public async Task<ActionResult> ManageLogins(ManageMessageId? message)
@@ -322,6 +385,50 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
         }
 
+        [HttpPost]
+        public async Task<JsonResult> DeleteAccount()
+        {
+            try
+            {
+                var userId = User.Identity.GetUserId();
+                var user = await UserManager.FindByIdAsync(userId);
+
+                if (user != null)
+                {
+                    // Optionally, you may want to perform additional cleanup
+                    // or log some information before deleting the user
+
+                    var result = await UserManager.DeleteAsync(user);
+
+                    if (result.Succeeded)
+                    {
+                        // Sign out the user after deleting the account
+                        AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+
+                        // Return success message
+                        return Json(new { success = true, message = "Account deleted successfully!" });
+                    }
+                    else
+                    {
+                        // Return error messages if deletion fails
+                        var errors = result.Errors;
+                        return Json(new { success = false, errors = errors });
+                    }
+                }
+                else
+                {
+                    // Return error message if user is not found
+                    return Json(new { success = false, message = "User not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or perform additional error handling
+                ModelState.AddModelError("", "An error occurred while deleting the account." + ex);
+                return Json(new { success = false, message = "An error occurred while deleting the account." + ex});
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && _userManager != null)
@@ -333,7 +440,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             base.Dispose(disposing);
         }
 
-#region Helpers
+        #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
