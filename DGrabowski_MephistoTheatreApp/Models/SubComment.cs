@@ -6,9 +6,9 @@ using System.Web;
 
 namespace DGrabowski_MephistoTheatreApp.Models
 {
-    public class Comment
+    public class SubComment
     {
-        public int CommentId { get; set; }
+        public int SubCommentId { get; set; }
         public DateTime TimeStamp { get; set; }
         public string Body { get; set; }
         public bool IsDraft { get; set; }
@@ -19,10 +19,10 @@ namespace DGrabowski_MephistoTheatreApp.Models
         public string UserId { get; set; }
         public User User { get; set; }
 
-        [ForeignKey("Post")]
-        public int PostId { get; set; }
-        public Post Post { get; set; }
+        [ForeignKey("Comment")]
+        public int CommentId { get; set; }
+        public Comment Comment { get; set; }
 
-        public List<SubComment> SubComments { get; set; }
+        public List<SubComment> ChildSubComments { get; set; }
     }
 }

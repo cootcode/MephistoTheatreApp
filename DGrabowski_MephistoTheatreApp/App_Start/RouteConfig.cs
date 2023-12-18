@@ -14,6 +14,12 @@ namespace DGrabowski_MephistoTheatreApp
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+            name: "PostSearch",
+            url: "Post/Search",
+            defaults: new { controller = "Posts", action = "Search" }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }

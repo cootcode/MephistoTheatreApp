@@ -1,0 +1,11 @@
+﻿@model DGrabowski_MephistoTheatreApp.Models.SearchViewModel
+
+@using (Html.BeginForm("Search", "Posts", FormMethod.Get))
+{
+    <div class="input-group">
+        @Html.TextBoxFor(model => model.SearchTerm, new { placeholder = "Enter search term...", @class = "form-control" })
+        <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </span>
+    </div>
+}

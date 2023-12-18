@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DGrabowski_MephistoTheatreApp.Models;
+using Microsoft.Ajax.Utilities;
+using PagedList;
 
 namespace DGrabowski_MephistoTheatreApp.Controllers
 {
@@ -15,24 +18,66 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         private MephistoTheatreDbContext db = new MephistoTheatreDbContext();
 
         // GET: Posts
-        public ActionResult Index()
+        public ActionResult Index(int? page, string category, string sortBy)
         {
-            var posts = db.Posts.Include(p => p.Category).Include(p => p.Staff);
-            return View(posts.ToList());
+            int pageSize = 4;
+            ViewBag.Category = category;
+            ViewBag.SortBy = sortBy;
+
+            var posts = db.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Staff)
+                .Include(p => p.Comments)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                posts = posts.Where(p => p.Category.CategoryName == category);
+            }
+
+            switch (sortBy)
+            {
+                case "Date":
+                    posts = posts.OrderByDescending(p => p.CreatedAt);
+                    break;
+                case "Author":
+                    posts = posts.OrderBy(p => p.Staff.FirstName).ThenBy(p => p.Staff.LastName);
+                    break;
+                case "Popularity":
+                    // Implement popularity sorting logic
+                    break;
+                default:
+                    posts = posts.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+
+            var pagedPosts = posts.ToPagedList(page ?? 1, pageSize);
+
+
+            return View(pagedPosts);
         }
 
+
         // GET: Posts/Details/5
+        [Route("Posts/Details/{id}")]
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Post post = db.Posts.Find(id);
+
+            // Eagerly load related entities (Category, Staff)
+            Post post = db.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Staff)
+                .SingleOrDefault(p => p.PostId == id);
+
             if (post == null)
             {
                 return HttpNotFound();
             }
+
             return View(post);
         }
 
@@ -124,6 +169,47 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult Search(SearchViewModel model)
+        {
+            var searchTerm = model.SearchTerm.ToLower(); // Convert to lowercase for case-insensitive search
+
+            var results = db.Posts
+                .Where(post =>
+                    post.Title.ToLower().Contains(searchTerm) ||
+                    post.Body.ToLower().Contains(searchTerm) ||
+                    post.Category.CategoryName.ToLower().Contains(searchTerm)
+                )
+                .ToList();
+
+            return View(results);
+        }
+
+        [HttpGet]
+        public ActionResult FilterByCategory(string category, int? page)
+        {
+            int pageSize = 1000;
+
+            var posts = db.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Staff)
+                .Include(p => p.Comments)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                posts = posts.Where(p => p.Category.CategoryName == category)
+                             .OrderByDescending(p => p.CreatedAt);
+            }
+            else
+            {
+                posts = posts.OrderByDescending(p => p.CreatedAt);
+            }
+
+            var pagedPosts = posts.ToPagedList(page ?? 1, pageSize);
+
+            return PartialView("_FilteredPostsPartial", pagedPosts);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -131,6 +217,19 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+    }
+
+    public static class PostsExtensions
+    {
+        public static Post GetRandomPost(this IPagedList<Post> pagedPosts)
+        {
+            if (pagedPosts.Any())
+            {
+                return pagedPosts.OrderBy(p => Guid.NewGuid()).FirstOrDefault();
+            }
+
+            return null;
         }
     }
 }

@@ -1,0 +1,11 @@
+﻿@model DGrabowski_MephistoTheatreApp.Models.Post
+
+<div class="card mb-4">
+    <a href="/Posts/Details/@Model.PostId"><img class="card-img-top" src="@Url.Content(Model.Category.ImagePath)" alt="..." style="width: 100%; height: 100%;"/></a>
+    <div class="card-body">
+        <div class="small text-muted">@Model.CreatedAt.ToString("MMMM d, yyyy")</div>
+        <h2 class="card-title">@Model.Title</h2>
+        <p class="card-text">@Html.Raw(Model.Body.Length > 120 ? Model.Body.Substring(0, 120) + "..." : Model.Body)</p>
+        <a class="btn btn-primary" href="/Posts/Details/@Model.PostId">Read more →</a>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@model List<DGrabowski_MephistoTheatreApp.Models.Post>
+
+@{
+    ViewBag.Title = "View";
+}
+
+<h2>Search Results</h2>
+
+<!-- Search widget-->
+<div class="card mb-4">
+    <div class="card-header">Search</div>
+    <div class="card-body">
+        @using (Html.BeginForm("Search", "Post", FormMethod.Get, new { @class = "input-group", onsubmit = "return validateSearchForm();" }))
+        {
+            <input class="form-control" type="text" name="SearchTerm" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" required />
+            <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
+        }
+    </div>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        <p>No results found.</p>
+    </div>
+}
+else
+{
+    foreach (var post in Model)
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">@post.Title</h3>
+                <p class="card-text">@post.Body</p>
+
+                @if (post.Category != null)
+                {
+                    <p class="card-text"><small class="text-muted">Category: @post.Category.CategoryName</small></p>
+                }
+
+                <a class="btn btn-primary" href="/Posts/Details/@post.PostId">Read more →</a>
+            </div>
+        </div>
+    }
+}
+
+<script>
+    function validateSearchForm() {
+        var searchTerm = document.getElementsByName("SearchTerm")[0].value.trim();
+        if (searchTerm === "") {
+            alert("Please enter a search term.");
+            return false; // Prevent form submission
+        }
+        return true; // Allow form submission
+    }
+</script>

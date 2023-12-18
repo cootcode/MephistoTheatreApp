@@ -218,9 +218,9 @@ namespace DGrabowski_MephistoTheatreApp.Models
         {
             var categories = new List<Category>
             {
-                new Category { CategoryName = "Announcements" },
-                new Category { CategoryName = "Movie Posts" },
-                new Category { CategoryName = "Reviews" },
+                new Category { CategoryName = "Announcements", ImagePath = "~/images/announcements.jpg" },
+                new Category { CategoryName = "Movie Posts", ImagePath = "~/images/moviepost.jpg" },
+                new Category { CategoryName = "Reviews", ImagePath = "~/images/review.jpg" },
                 // Add more categories here as needed
             };
 
@@ -273,22 +273,202 @@ namespace DGrabowski_MephistoTheatreApp.Models
 
         private void SeedPosts(MephistoTheatreDbContext context)
         {
-                var posts = new List<Post>
+            var posts = new List<Post>
+            {
+                new Post
                 {
-                    new Post
-                    {
-                        Title = "Example Post 1",
-                        CreatedAt = DateTime.Now,
-                        Body = "This is the body of the post.",
-                        IsPublished = true,
-                        IsArchived = false,
-                        LastEditAt = null,
-                        IsDraft = false,
-                        StaffId = context.Staffs.First().Id, // Assuming you have staff members seeded
-                        CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId, // Assuming you have categories seeded
-                    },
-                    // Add more posts as needed
-                };
+                    Title = "Example Post 1",
+                    CreatedAt = DateTime.Now,
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First(s => s.UserName == "jeff@mephisto.com").Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Announcement: New Website Launched",
+                    CreatedAt = DateTime.Now,
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Movie Review: Inception",
+                    CreatedAt = DateTime.Now.AddDays(+5),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Reviews").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(+10),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Movie Posts").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(-7),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(+41),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Reviews").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(-10),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Movie Posts").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(-1),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Reviews").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Example Post 1",
+                    CreatedAt = DateTime.Now,
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First(s => s.UserName == "jeff@mephisto.com").Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Announcement: New Website Launched",
+                    CreatedAt = DateTime.Now.AddDays(-41),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Movie Review: Inception",
+                    CreatedAt = DateTime.Now.AddDays(-3),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Reviews").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(-17),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Movie Posts").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Example Post 1",
+                    CreatedAt = DateTime.Now.AddDays(-3),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First(s => s.UserName == "jeff@mephisto.com").Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Announcement: New Website Launched",
+                    CreatedAt = DateTime.Now.AddDays(77),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Movie Review: Inception",
+                    CreatedAt = DateTime.Now.AddDays(14),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Reviews").CategoryId,
+                },
+                new Post
+                {
+                    Title = "Upcoming Event: Movie Night",
+                    CreatedAt = DateTime.Now.AddDays(-6),
+                    Body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.Nunc sagittis gravida arcu, eget placerat justo sagittis in.Fusce bibendum libero sed commodo bibendum.Aliquam erat volutpat. Vestibulum vel imperdiet augue.Nullam convallis, tortor a bibendum mattis, ipsum nisi venenatis elit.Proin non felis sit amet augue scelerisque convallis.Aenean consectetur, ex vel congue scelerisque, nunc purus convallis justo.Maecenas hendrerit magna eu ex vehicula, a tempor dolor aliquam.Vivamus auctor elit at tristique accumsan.Sed facilisis urna vel orci varius, in commodo elit ullamcorper.Quisque at justo id ante ultrices bibendum.Morbi tincidunt, urna id tincidunt vestibulum, sapien mi cursus risus.Integer et velit ac purus dapibus congue.Sed non turpis ut ligula commodo convallis.Aenean auctor odio eu velit condimentum, vel rhoncus leo imperdiet.Nam et sapien at ligula suscipit fermentum.",
+                    IsPublished = true,
+                    IsArchived = false,
+                    LastEditAt = null,
+                    IsDraft = false,
+                    StaffId = context.Staffs.First().Id,
+                    CategoryId = context.Categories.First(c => c.CategoryName == "Announcements").CategoryId,
+                },
+                // Add more posts as needed
+            };
 
             posts.ForEach(p => context.Posts.AddOrUpdate(post => post.Title, p));
             context.SaveChanges();

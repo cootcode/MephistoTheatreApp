@@ -1,33 +1,82 @@
-﻿@model IEnumerable<DGrabowski_MephistoTheatreApp.Models.Post>
-
+﻿@using PagedList
+@using PagedList.Mvc
+@using DGrabowski_MephistoTheatreApp.Controllers
+@model PagedList.IPagedList<DGrabowski_MephistoTheatreApp.Models.Post>
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Blog";
 }
-
-<div class="row">
+<!-- Horizontal Image with three masks top of the page-->
+<img src="~/images/triplemasksimage.png" class="img-fluid" alt="Responsive Image" />
+<!-- Page header with logo and tagline-->
+<header class="py-2 bg-light border-bottom mb-4">
     <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <h3 class="page-title">User Comment</h3>
-            </div>
+        <div class="text-center my-2">
+            <h1 class="fw-bolder">Welcome To The Show!</h1>
+            <p class="lead mb-0">Mephisto Theatre Blog Page</p>
         </div>
-        <div class="row">
-            <div class="col-sm-1">
-                <div class="thumbnail">
-                    <img class="img-responsive user-photo"
-                         src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+    </div>
+</header>
+<!-- Page content-->
+<div class="container">
+    <div class="row">
+        <!-- Blog entries-->
+        <div class="col-lg-8">
+            <!-- Featured blog post-->
+            @Html.Partial("_FeaturedPostPartial", Model.GetRandomPost())
+            <!-- Nested row for non-featured blog posts-->
+            <div id="posts-container" class="row">
+                @foreach (var post in Model)
+                {
+                    @Html.Partial("_PostPartial", post)
+                }
+            </div>
+            <!-- Pagination-->
+            <nav aria-label="Pagination">
+                <hr class="my-0" />
+                <ul class="pagination justify-content-center my-4">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, category = ViewBag.Category }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+                </ul>
+            </nav>
+        </div>
+        <!-- Side widgets-->
+        <div class="col-lg-4">
+            <!-- Search widget-->
+            <div class="card mb-4">
+                <div class="card-header">Search</div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Search", "Post", FormMethod.Get, new { @class = "input-group", onsubmit = "return validateSearchForm();" }))
+                    {
+                        <input class="form-control" type="text" name="SearchTerm" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" required />
+                        <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
+                    }
                 </div>
             </div>
-            <div class="col-sm-6">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <textarea class="form-control"
-                                  cols="15"
-                                  id="commentInput"></textarea>
+            <!-- Categories widget-->
+            <div class="card mb-4">
+                <div class="card-header">Categories</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                <li><a href="javascript:void(0);" class="category-link" data-category="Announcements">Announcements</a></li>
+                                <li><a href="javascript:void(0);" class="category-link" data-category="Movie Posts">Movie Posts</a></li>
+                                <li><a href="javascript:void(0);" class="category-link" data-category="Reviews">Reviews</a></li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="panel-heading comment-action">
-                        <div class="submit-comment">
-                            <a href="https://www.blogger.com/null" id="addNewCommentBtn">Submit</a>
+                </div>
+            </div>
+            <!-- Sort by widget-->
+            <div class="card mb-4">
+                <div class="card-header">Sort By:</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                <li><a href="javascript:void(0);" class="sort-link" data-sort="Date" data-category="@ViewBag.Category">Date</a></li>
+                                <li><a href="javascript:void(0);" class="sort-link" data-sort="Author" data-category="@ViewBag.Category">Author</a></li>
+                                <li><a href="javascript:void(0);" class="sort-link" data-sort="Popularity" data-category="@ViewBag.Category">Popularity</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -35,3 +84,76 @@
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- jQuery AJAX callback script and Search widget javascript error check-->
+<script>
+    var category = '@ViewBag.Category';
+    var sortBy = '@ViewBag.SortBy';
+
+    $(document).ready(function () {
+        $('.category-link').on('click', function (e) {
+            e.preventDefault();
+            var category = $(this).data('category');
+            console.log('Category clicked:', category);
+            filterPostsByCategory(category);
+        });
+
+        function filterPostsByCategory(category) {
+            var page = $('.pagination .active').text() || 1;
+            $('.pagination').hide();
+            $.ajax({
+                url: '/Posts/FilterByCategory',
+                type: 'GET',
+                data: { category: category, page: page, sortBy: sortBy },
+                success: function (data) {
+                    console.log('Success! Data:', data);
+                    $('#posts-container').html(data);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching sorted posts. Status:', status, 'Error:', error);
+                }
+            });
+        }
+
+        function attachSortEvents() {
+            $('.sort-link').on('click', function (e) {
+                e.preventDefault();
+                var sortBy = $(this).data('sort');
+                var category = $('.category-link.active').data('category') || '';
+                console.log('Sort by:', sortBy, 'Category:', category);
+                sortPosts(sortBy, category);
+            });
+        }
+
+        function sortPosts(sortBy, category) {
+            var page = $('.pagination .active').text() || 1;
+            console.log('Sorting by:', sortBy, 'Page:', page);
+
+            $.ajax({
+                url: '/Posts/FilterByCategory', // Update to the correct action
+                type: 'GET',
+                data: { category: category, page: page, sortBy: sortBy },
+                async: true, // Use asynchronous request
+                success: function (data) {
+                    console.log('Success! Data:', data);
+                    $('#posts-container').html(data);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching sorted posts. Status:', status, 'Error:', error);
+                }
+            });
+        }
+
+        attachSortEvents();
+
+        function validateSearchForm() {
+            var searchTerm = document.getElementsByName("SearchTerm")[0].value.trim();
+            if (searchTerm === "") {
+                alert("Please enter a search term.");
+                return false;
+            }
+            return true;
+        }
+    });
+</script>
