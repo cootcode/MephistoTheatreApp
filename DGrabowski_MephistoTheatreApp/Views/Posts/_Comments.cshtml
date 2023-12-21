@@ -1,0 +1,41 @@
+﻿@model List<DGrabowski_MephistoTheatreApp.Models.Comment>
+
+@if (Model != null && Model.Any())
+{
+    <div class="comments-container">
+        <h4>Comments</h4>
+        @foreach (var comment in Model)
+        {
+            <div class="comment">
+                <div class="comment-header">
+                    <strong>@comment.User.UserName</strong> on @comment.TimeStamp
+                </div>
+                <div class="comment-body">
+                    @comment.Body
+                </div>
+
+                <!-- Render nested comments -->
+                @if (comment.SubComments != null && comment.SubComments.Any())
+                {
+                    <div class="nested-comments">
+                        @foreach (var subComment in comment.SubComments)
+                        {
+                            <div class="sub-comment">
+                                <div class="sub-comment-header">
+                                    <strong>@subComment.User.UserName</strong> on @subComment.TimeStamp
+                                </div>
+                                <div class="sub-comment-body">
+                                    @subComment.Body
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No comments available.</p>
+}

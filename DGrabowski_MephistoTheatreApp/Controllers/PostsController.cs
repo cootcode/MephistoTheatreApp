@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using DGrabowski_MephistoTheatreApp.Models;
 using Microsoft.Ajax.Utilities;
+using Microsoft.AspNet.Identity;
 using PagedList;
 
 namespace DGrabowski_MephistoTheatreApp.Controllers
@@ -57,6 +58,53 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             return View(pagedPosts);
         }
 
+        [HttpPost]
+        public ActionResult SubmitComment(string commentText, int postId)
+        {
+            // Assuming you have a service or repository to handle comment submission to the database
+            // Example: commentService.SubmitComment(commentText, postId);
+
+            // For simplicity, creating a dummy comment and adding it to the post's comments
+            var newComment = new Comment
+            {
+                TimeStamp = DateTime.Now,
+                Body = commentText,
+                IsDraft = false,
+                IsPublished = true, // Adjust based on your logic
+                UserId = User.Identity.GetUserId(), // Assuming you are using ASP.NET Identity
+                PostId = postId
+            };
+
+            // Assuming you have a DbContext or repository to save the new comment
+            // Example: dbContext.Comments.Add(newComment); dbContext.SaveChanges();
+
+            // Fetch the updated comments for the post
+            var updatedComments = GetCommentsForPost(postId);
+
+            // You may want to return a PartialView or JSON response based on your needs
+            return PartialView("_Comments", updatedComments);
+        }
+
+        private List<Comment> GetCommentsForPost(int postId)
+        {
+            // Assuming you have a service or repository to fetch comments for a post
+            // Example: var comments = commentService.GetCommentsForPost(postId);
+
+            // For simplicity, creating dummy comments
+            var comments = new List<Comment>
+        {
+            new Comment
+            {
+                User = new Staff { UserName = "JohnDoe" }, // Assuming User is a navigational property in Comment
+                TimeStamp = DateTime.Now,
+                Body = "This is a sample comment",
+                SubComments = new List<SubComment>()
+            },
+            // Add more comments as needed
+        };
+
+            return comments;
+        }
 
         // GET: Posts/Details/5
         [Route("Posts/Details/{id}")]
@@ -71,6 +119,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             Post post = db.Posts
                 .Include(p => p.Category)
                 .Include(p => p.Staff)
+                .Include(p => p.Comments)
                 .SingleOrDefault(p => p.PostId == id);
 
             if (post == null)
