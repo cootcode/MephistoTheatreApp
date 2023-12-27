@@ -13,6 +13,8 @@ namespace DGrabowski_MephistoTheatreApp.Models
         public string Body { get; set; }
         public bool IsDraft { get; set; }
         public bool IsPublished { get; set; }
+        public int? ParentCommentId { get; set; }
+
 
         // navigational properties
         [ForeignKey("User")]
@@ -23,6 +25,9 @@ namespace DGrabowski_MephistoTheatreApp.Models
         public int PostId { get; set; }
         public Post Post { get; set; }
 
-        public List<SubComment> SubComments { get; set; }
+        [ForeignKey("ParentCommentId")]
+        public virtual Comment ParentComment { get; set; }
+
+        public virtual ICollection<SubComment> SubComments { get; set; }
     }
 }

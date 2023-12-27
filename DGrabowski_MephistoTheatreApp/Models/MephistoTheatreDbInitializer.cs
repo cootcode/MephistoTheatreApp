@@ -476,39 +476,37 @@ namespace DGrabowski_MephistoTheatreApp.Models
 
         private void SeedComments(MephistoTheatreDbContext context)
         {
-            var comments = new List<Comment>
-            {
-                new Comment
-                {
-                    TimeStamp = DateTime.Now,
-                    Body = "This is a first comment on the post.",
-                    IsDraft = false,
-                    IsPublished = true,
-                    UserId = context.Members.First().Id, 
-                    PostId = context.Posts.First().PostId, 
-                },
-                new Comment
-                {
-                    TimeStamp = DateTime.Now,
-                    Body = "This is a second comment on the post.",
-                    IsDraft = false,
-                    IsPublished = true,
-                    UserId = context.Members.First().Id, 
-                    PostId = context.Posts.First().PostId,
-                },
-                new Comment
-                {
-                    TimeStamp = DateTime.Now,
-                    Body = "This is a third comment on the post.",
-                    IsDraft = false,
-                    IsPublished = true,
-                    UserId = context.Members.First().Id,
-                    PostId = context.Posts.First().PostId,
-                },
-                // Add more comments as needed
-            };
+            var posts = context.Posts.ToList(); // Retrieve all posts
+            var userIdForComments = context.Users.OrderBy(u => u.Id).Select(u => u.Id).FirstOrDefault();
 
-            comments.ForEach(c => context.Comments.AddOrUpdate(comment => comment.Body, c));
+            foreach (var post in posts)
+            {
+                var comments = new List<Comment>
+        {
+            new Comment
+            {
+                TimeStamp = DateTime.Now,
+                Body = "This is the first comment on the post.",
+                IsDraft = false,
+                IsPublished = true,
+                UserId = userIdForComments,
+                PostId = post.PostId, // Use the current post's ID
+            },
+            new Comment
+            {
+                TimeStamp = DateTime.Now,
+                Body = "This is the second comment on the post.",
+                IsDraft = false,
+                IsPublished = true,
+                UserId = userIdForComments,
+                PostId = post.PostId, // Use the current post's ID
+            },
+            // You can add more comments here if needed
+        };
+
+                comments.ForEach(c => context.Comments.AddOrUpdate(comment => comment.Body, c));
+            }
+
             context.SaveChanges();
         }
     }

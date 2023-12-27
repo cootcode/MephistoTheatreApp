@@ -1,4 +1,5 @@
 ﻿using DGrabowski_MephistoTheatreApp.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Owin;
 using System.Web.Services.Description;
@@ -12,5 +13,8 @@ namespace DGrabowski_MephistoTheatreApp
         {
             ConfigureAuth(app);
         }
+
+
     }
+
 }

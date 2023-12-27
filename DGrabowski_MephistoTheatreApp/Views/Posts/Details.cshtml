@@ -9,6 +9,57 @@
     .search-card {
         width: 100%;
     }
+
+    /* Styles for post content */
+    article {
+        margin-bottom: 30px;
+    }
+
+    /* Styles for comments section */
+    .card.bg-light {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    #comment-text {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .comment {
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+        padding: 10px;
+    }
+
+    .comment-header {
+        background-color: #f5f5f5;
+        padding: 5px;
+    }
+
+    .comment-body {
+        margin-top: 5px;
+    }
+
+    .nested-comments {
+        margin-left: 20px; /* Adjust indentation for nested comments */
+    }
+
+    .sub-comment {
+        border: 1px solid #ddd;
+        margin-top: 10px;
+        padding: 8px;
+    }
+
+    .sub-comment-header {
+        background-color: #f5f5f5;
+        padding: 3px;
+    }
+
+    .sub-comment-body {
+        margin-top: 5px;
+    }
 </style>
 
 <!-- Horizontal Image with three masks top of the page-->
@@ -44,10 +95,19 @@
                 <div class="card bg-light">
                     <div class="card-body">
                         <!-- Comment form -->
-                        <form id="comment-form" class="mb-4">
-                            <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!" id="comment-text" style="max-width:100%"></textarea>
-                            <button type="button" class="btn btn-primary mt-2" onclick="submitComment()">Submit Comment</button>
-                        </form>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form id="comment-form" class="mb-4">
+                                <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!" id="comment-text"></textarea>
+                                <button type="button" class="btn btn-primary mt-2" onclick="submitComment()">Submit Comment</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning" role="alert">
+                                You need to be logged in to comment. <a href="@Url.Action("Login", "Account")">Log in here</a>.
+                            </div>
+                        }
                         <!-- Comment container -->
                         <div id="comments-container" class="col-lg-12">
                             @Html.Partial("_Comments", Model.Comments.ToList())
@@ -74,31 +134,107 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+@section scripts {
+    <script>
+        function toggleReplyForm(commentId) {
+            var form = $('#reply-form-' + commentId);
+            form.toggle();
+        }
 
-<script>
-    function submitComment() {
-        // Get the comment text from the textarea
-        var commentText = document.getElementById("comment-text").value;
+        function submitComment() {
+            var commentText = $('#comment-text').val().trim();
+            if (!commentText) {
+                alert("Please enter a comment before submitting.");
+                return;
+            }
+        var postId = @Model.PostId;
 
-        // Perform any validation if needed
-
-        // Make an AJAX request to submit the comment to the server
-        // Adjust the URL and other parameters based on your server-side implementation
-        // For simplicity, this example assumes you are using jQuery for the AJAX request
         $.ajax({
-            url: '/YourController/SubmitComment',
-            method: 'POST',
-            data: { comment: commentText },
+            type: 'POST',
+            url: '/Posts/SubmitComment',
+            data: { commentText: commentText, postId: postId },
             success: function (data) {
-                // Handle the success response, e.g., update the comments container
-                $('#comments-container').html(data);
-                // Clear the comment textarea
-                document.getElementById("comment-text").value = "";
+                if (data.success) {
+                    // If successful, update the comments container
+                    $('#comments-container').html(data.html);
+                    // Optionally, clear the comment textarea after submission
+                    $('#comment-text').val('');
+                } else {
+                    // If unsuccessful, display the error message
+                    alert(data.message); // You can use a more user-friendly UI element for the error message
+                }
             },
             error: function (error) {
-                // Handle the error response
-                console.error('Error submitting comment:', error);
+                console.error("Error submitting comment:", error);
             }
         });
-    }
-</script>
+        }
+
+        function submitReply(commentId) {
+            var replyText = $('#reply-text-' + commentId).val().trim();
+            if (!replyText) {
+                alert("Please enter a reply before submitting.");
+                return;
+            }
+
+                console.log('Attempting to submit reply for commentId:', commentId);
+
+                // Retrieve the reply text from the textarea
+                var replyText = $('#reply-text-' + commentId).val();
+                console.log('Reply text:', replyText);
+
+                
+                var postId = @Model.PostId;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Posts/SubmitReply',
+                    data: { replyText: replyText, commentId: commentId, postId: postId },
+                    success: function (data) {
+                        if (data.success) {
+                            // If successful, update the comments container
+                            $('#comments-container').html(data.html);
+                            // clear the reply textarea after submission
+                            $('#reply-text-' + commentId).val('');
+                        } else {
+                            // If unsuccessful, display the error message
+                            alert(data.message);
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error submitting reply:", error);
+                    }
+                });
+        }
+
+        function checkForUpdates() {
+            var postId = @Model.PostId;
+
+            // Make an AJAX request to check for updates
+            $.ajax({
+                url: "/Posts/GetComments/" + postId,
+                type: "GET",
+                success: function (data) {
+                    // Update the comments section with the new data
+                    $("#comments-container").html(data);
+                },
+                error: function (error) {
+                    console.error("Error checking for updates: " + error);
+                }
+            });
+        }
+
+        // Periodically check for updates every 30 seconds (adjust as needed)
+        setInterval(checkForUpdates, 30000);
+
+        $(document).ready(function () {
+            var postId = @Model.PostId;
+
+            // Make an initial GET request to load comments for the post
+            $.get("/Posts/GetComments", { postId: postId }, function (data) {
+                $('#comments-container').html(data);
+            });
+        });
+    </script>
+}

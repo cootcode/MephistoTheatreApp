@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Remoting.Contexts;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using DGrabowski_MephistoTheatreApp.Models;
 using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
@@ -17,6 +20,10 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
     public class PostsController : Controller
     {
         private MephistoTheatreDbContext db = new MephistoTheatreDbContext();
+
+        public PostsController()
+        {
+        }
 
         // GET: Posts
         public ActionResult Index(int? page, string category, string sortBy)
@@ -58,52 +65,110 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             return View(pagedPosts);
         }
 
-        [HttpPost]
-        public ActionResult SubmitComment(string commentText, int postId)
+        public ActionResult GetComments(int postId)
         {
-            // Assuming you have a service or repository to handle comment submission to the database
-            // Example: commentService.SubmitComment(commentText, postId);
+            var comments = db.Comments
+                .Include(c => c.User)
+                .Include(c => c.SubComments)
+                .Where(c => c.PostId == postId).ToList()
+                .ToList();
 
-            // For simplicity, creating a dummy comment and adding it to the post's comments
+            return PartialView("_Comments", comments);
+        }
+
+        [HttpPost]
+        [Authorize] // Restrict to logged-in users
+        public ActionResult SubmitComment(string commentText, int postId, int? parentCommentId)
+        {
+            var userId = User.Identity.GetUserId();
+            var user = db.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (user == null || user.IsSuspended)
+            {
+                return Json(new { success = false, message = user == null ? "User not found." : "Your account is suspended. You cannot submit comments." });
+            }
+
             var newComment = new Comment
             {
                 TimeStamp = DateTime.Now,
                 Body = commentText,
                 IsDraft = false,
-                IsPublished = true, // Adjust based on your logic
-                UserId = User.Identity.GetUserId(), // Assuming you are using ASP.NET Identity
-                PostId = postId
+                IsPublished = false,
+                UserId = userId,
+                PostId = postId,
+                ParentCommentId = parentCommentId
             };
 
-            // Assuming you have a DbContext or repository to save the new comment
-            // Example: dbContext.Comments.Add(newComment); dbContext.SaveChanges();
+            db.Comments.Add(newComment);
+            db.SaveChanges();
 
-            // Fetch the updated comments for the post
-            var updatedComments = GetCommentsForPost(postId);
+            var comments = db.Comments
+                .Include(c=> c.User)
+                .Include(c=> c.SubComments)
+                .Where(c => c.PostId == postId).ToList();
+            var commentsHtml = RenderPartialViewToString("_Comments", comments);
 
-            // You may want to return a PartialView or JSON response based on your needs
-            return PartialView("_Comments", updatedComments);
+            return Json(new { success = true, html = commentsHtml });
         }
 
-        private List<Comment> GetCommentsForPost(int postId)
+        [HttpPost]
+        [Authorize] // Restrict to logged-in users
+        public ActionResult SubmitReply(string replyText, int commentId, int postId)
         {
-            // Assuming you have a service or repository to fetch comments for a post
-            // Example: var comments = commentService.GetCommentsForPost(postId);
-
-            // For simplicity, creating dummy comments
-            var comments = new List<Comment>
-        {
-            new Comment
+            try
             {
-                User = new Staff { UserName = "JohnDoe" }, // Assuming User is a navigational property in Comment
-                TimeStamp = DateTime.Now,
-                Body = "This is a sample comment",
-                SubComments = new List<SubComment>()
-            },
-            // Add more comments as needed
-        };
+                var userId = User.Identity.GetUserId();
+                var existingComment = db.Comments.Find(commentId);
 
-            return comments;
+                var newSubComment = new SubComment
+                {
+                    TimeStamp = DateTime.Now,
+                    Body = replyText,
+                    IsDraft = false,
+                    IsPublished = false,
+                    UserId = userId,
+                    CommentId = commentId,
+                    Comment = existingComment,
+                };
+
+                db.SubComments.Add(newSubComment);
+                db.SaveChanges();
+
+                var comments = db.Comments
+                    .Include(c => c.User)
+                    .Include(c => c.SubComments)
+                    .Where(c => c.PostId == postId)
+                    .ToList();
+
+                var commentsHtml = RenderPartialViewToString("_Comments", comments);
+                return Json(new { success = true, html = commentsHtml });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return Json(new { success = false, message = "Error submitting reply." });
+            }
+        }
+
+
+        // Helper method to render a partial view to a string
+        private string RenderPartialViewToString(string viewName, object model)
+        {
+            if (string.IsNullOrEmpty(viewName))
+            {
+                viewName = ControllerContext.RouteData.GetRequiredString("action");
+            }
+
+            ViewData.Model = model;
+
+            using (var sw = new StringWriter())
+            {
+                var viewResult = ViewEngines.Engines.FindPartialView(ControllerContext, viewName);
+                var viewContext = new ViewContext(ControllerContext, viewResult.View, ViewData, TempData, sw);
+                viewResult.View.Render(viewContext, sw);
+
+                return sw.GetStringBuilder().ToString();
+            }
         }
 
         // GET: Posts/Details/5
@@ -120,6 +185,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 .Include(p => p.Category)
                 .Include(p => p.Staff)
                 .Include(p => p.Comments)
+                .Include(p => p.Comments.Select(c => c.SubComments))
                 .SingleOrDefault(p => p.PostId == id);
 
             if (post == null)

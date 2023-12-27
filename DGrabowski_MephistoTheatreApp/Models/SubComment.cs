@@ -14,7 +14,7 @@ namespace DGrabowski_MephistoTheatreApp.Models
         public bool IsDraft { get; set; }
         public bool IsPublished { get; set; }
 
-        // navigational properties
+        // Navigational properties
         [ForeignKey("User")]
         public string UserId { get; set; }
         public User User { get; set; }
@@ -22,7 +22,6 @@ namespace DGrabowski_MephistoTheatreApp.Models
         [ForeignKey("Comment")]
         public int CommentId { get; set; }
         public Comment Comment { get; set; }
-
-        public List<SubComment> ChildSubComments { get; set; }
+        public List<SubComment> SubCommentReplies { get; set; }
     }
 }

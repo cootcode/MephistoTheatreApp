@@ -1,4 +1,5 @@
-﻿@model List<DGrabowski_MephistoTheatreApp.Models.Comment>
+﻿@model List<Comment>
+@using DGrabowski_MephistoTheatreApp.Models
 
 @if (Model != null && Model.Any())
 {
@@ -6,32 +7,59 @@
         <h4>Comments</h4>
         @foreach (var comment in Model)
         {
-            <div class="comment">
-                <div class="comment-header">
-                    <strong>@comment.User.UserName</strong> on @comment.TimeStamp
-                </div>
-                <div class="comment-body">
-                    @comment.Body
-                </div>
-
-                <!-- Render nested comments -->
-                @if (comment.SubComments != null && comment.SubComments.Any())
-                {
-                    <div class="nested-comments">
-                        @foreach (var subComment in comment.SubComments)
+            if (comment.IsPublished)
+            {
+                <div class="comment">
+                    <div class="comment-header">
+                        @if (comment.User != null)
                         {
-                            <div class="sub-comment">
-                                <div class="sub-comment-header">
-                                    <strong>@subComment.User.UserName</strong> on @subComment.TimeStamp
-                                </div>
-                                <div class="sub-comment-body">
-                                    @subComment.Body
-                                </div>
-                            </div>
+                            <strong>@comment.User.UserName</strong> @comment.TimeStamp.ToString("dd/MM/yyyy HH:mm:ss")
                         }
+                        else
+                        {
+                            <strong>Unknown User</strong> @comment.TimeStamp.ToString("dd/MM/yyyy HH:mm:ss")
+                        }
+                        <button type="button" class="btn btn-primary float-end" onclick="toggleReplyForm(@comment.CommentId)">Reply</button>
                     </div>
-                }
-            </div>
+                    <div class="comment-body">
+                        @comment.Body
+                    </div>
+
+                    <!-- Reply form -->
+                    <form id="reply-form-@comment.CommentId" class="mb-4" style="display: none;">
+                        <textarea class="form-control" rows="3" placeholder="Reply to this comment..." id="reply-text-@comment.CommentId"></textarea>
+                        <button type="button" class="btn btn-primary mt-2" onclick="submitReply(@comment.CommentId, @comment.PostId)">Submit Reply</button>
+                    </form>
+
+                    <!-- Render nested comments -->
+                    @if (comment.SubComments != null && comment.SubComments.Any())
+                    {
+                        <div class="nested-comments">
+                            @foreach (var subComment in comment.SubComments)
+                            {
+                                if (subComment.IsPublished)
+                                {
+                                    <div class="sub-comment">
+                                        <div class="sub-comment-header">
+                                            @if (subComment.User != null)
+                                            {
+                                                <strong>@subComment.User.UserName</strong> @subComment.TimeStamp.ToString("dd/MM/yyyy HH:mm:ss")
+                                            }
+                                            else
+                                            {
+                                                <strong>Unknown User</strong> @subComment.TimeStamp.ToString("dd/MM/yyyy HH:mm:ss")
+                                            }
+                                        </div>
+                                        <div class="sub-comment-body">
+                                            @subComment.Body
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
         }
     </div>
 }

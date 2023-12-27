@@ -17,8 +17,49 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         // GET: Comments
         public ActionResult Index()
         {
-            var comments = db.Comments.Include(c => c.Post).Include(c => c.User);
+            var comments = db.Comments
+                .Include(c => c.SubComments)
+                .Include(c => c.Post)
+                .Include(c => c.User);
             return View(comments.ToList());
+        }
+
+        [HttpPost]
+        public ActionResult PublishUnpublishComment(int commentId, string commentAction)
+        {
+            var comment = db.Comments.Find(commentId);
+
+            if (comment != null)
+            {
+                // Toggle the IsPublished property
+                comment.IsPublished = !comment.IsPublished;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                // Comment not found
+                return HttpNotFound();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult PublishUnpublishSubComment(int subCommentId, string commentAction)
+        {
+            var subComment = db.SubComments.Find(subCommentId);
+
+            if (subComment != null)
+            {
+                // Toggle the IsPublished property for the sub-comment
+                subComment.IsPublished = !subComment.IsPublished;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                // Sub-comment not found
+                return HttpNotFound();
+            }
         }
 
         // GET: Comments/Details/5
@@ -39,6 +80,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         // GET: Comments/Create
         public ActionResult Create()
         {
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body");
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title");
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName");
             return View();
@@ -49,7 +91,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CommentId,TimeStamp,Body,IsDraft,IsPublished,UserId,PostId")] Comment comment)
+        public ActionResult Create([Bind(Include = "CommentId,TimeStamp,Body,IsDraft,IsPublished,ParentCommentId,UserId,PostId")] Comment comment)
         {
             if (ModelState.IsValid)
             {
@@ -58,6 +100,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 return RedirectToAction("Index");
             }
 
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body", comment.ParentCommentId);
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title", comment.PostId);
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", comment.UserId);
             return View(comment);
@@ -75,6 +118,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             {
                 return HttpNotFound();
             }
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body", comment.ParentCommentId);
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title", comment.PostId);
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", comment.UserId);
             return View(comment);
@@ -85,7 +129,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CommentId,TimeStamp,Body,IsDraft,IsPublished,UserId,PostId")] Comment comment)
+        public ActionResult Edit([Bind(Include = "CommentId,TimeStamp,Body,IsDraft,IsPublished,ParentCommentId,UserId,PostId")] Comment comment)
         {
             if (ModelState.IsValid)
             {
@@ -93,6 +137,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body", comment.ParentCommentId);
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title", comment.PostId);
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", comment.UserId);
             return View(comment);
