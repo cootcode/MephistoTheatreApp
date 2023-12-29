@@ -4,15 +4,15 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>Comment Management System</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
         <th>
             Comment ID
+        </th>
+        <th>
+            Comment Type
         </th>
         <th>
             Post ID
@@ -39,6 +39,16 @@
                 @Html.DisplayFor(modelItem => item.CommentId)
             </td>
             <td>
+                @if (item.ParentCommentId == null)
+                {
+                    <span><strong>Comment</strong></span>
+                }
+                else
+                {
+                    <span>Subcomment</span>
+                }
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Post.PostId)
             </td>
             <td>
@@ -59,56 +69,58 @@
                     @Html.Hidden("commentId", item.CommentId)
                     <input type="submit" name="commentAction" value="@((item.IsPublished) ? "Unpublish" : "Publish")" class="btn @(item.IsPublished ? "btn-warning" : "btn-success")" />
                 }
-                @Html.ActionLink("Delete", "Delete", new { id = item.CommentId }, new { @class = "btn btn-danger" })
 
-
-                <!-- Display sub-comments -->
-                @if (item.SubComments != null && item.SubComments.Any())
+                @using (Html.BeginForm("DeleteComment", "Comments", FormMethod.Post, new { @class = "form-inline" }))
                 {
-                    <table class="table sub-comments-table">
-                        <tr>
-                            <th>
-                                Sub-Comment ID
-                            </th>
-                            <th>
-                                Sub-Comment Body
-                            </th>
-                            <th>
-                                Is Published
-                            </th>
-                            <th>
-                                Author
-                            </th>
-                            <th></th>
-                        </tr>
-                        @foreach (var subComment in item.SubComments)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => subComment.CommentId)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => subComment.Body)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => subComment.IsPublished)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => subComment.User.UserName)
-                                </td>
-                                <td>
-                                    @using (Html.BeginForm("PublishUnpublishSubComment", "Comments", FormMethod.Post, new { @class = "form-inline" }))
-                                    {
-                                        @Html.Hidden("subCommentId", subComment.CommentId)
-                                        <input type="submit" name="commentAction" value="@((subComment.IsPublished) ? "Unpublish" : "Publish")" class="btn @(subComment.IsPublished ? "btn-warning" : "btn-success")" />
-                                    }
-                                    @Html.ActionLink("Delete", "Delete", new { id = subComment.CommentId }, new { @class = "btn btn-danger" })
-                                </td>
-                            </tr>
-                        }
-                    </table>
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("commentId", item.CommentId)
+                    <input type="submit" value="Delete" class="btn btn-danger" />
                 }
             </td>
-        </tr>
-    }
+
+                    @if (item.SubComments != null && item.SubComments.Any())
+                    {
+                        foreach (var subComment in item.SubComments)
+                        {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => subComment.SubCommentId)
+                            </td>
+                            <td>
+                                <span>Subcomment</span>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => subComment.Comment.Post.PostId)
+                            </td>
+                            <td>
+                                @Html.ActionLink("View Post", "Details", "Posts", new { id = subComment.Comment.Post.PostId }, null)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => subComment.Body)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => subComment.IsPublished)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => subComment.User.UserName)
+                            </td>
+                            <td>
+                                @using (Html.BeginForm("PublishUnpublishSubComment", "Comments", FormMethod.Post, new { @class = "form-inline" }))
+                                {
+                                    @Html.Hidden("subCommentId", subComment.SubCommentId)
+                                    <input type="submit" name="subCommentAction" value="@((subComment.IsPublished) ? "Unpublish" : "Publish")" class="btn @(subComment.IsPublished ? "btn-warning" : "btn-success")" />
+                                }
+
+                                @using (Html.BeginForm("DeleteSubComment", "Comments", FormMethod.Post, new { @class = "form-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("subCommentId", subComment.SubCommentId)
+                                    <input type="submit" value="Delete" class="btn btn-danger" />
+                                }
+                            </td>
+                        </tr>
+                        }
+                     }
+               </tr>
+     }
 </table>

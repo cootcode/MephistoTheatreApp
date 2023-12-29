@@ -7,6 +7,8 @@
         <div class="card-body">
             <div class="small text-muted">@Model.CreatedAt.ToString("MMMM d, yyyy")</div>
             <h2 class="card-title h4">@Model.Title</h2>
+            <div class="small">Author: @Model.Staff.FirstName @Model.Staff.LastName</div>
+            <div class="small text-muted">Comments: @Model.CommentsCount</div>
             <p class="card-text">@Html.Raw(Model.Body.Length > 120 ? Model.Body.Substring(0, 120) + "..." : Model.Body)</p>
             <a class="btn btn-primary" href="/Posts/Details/@Model.PostId">Read more →</a>
         </div>

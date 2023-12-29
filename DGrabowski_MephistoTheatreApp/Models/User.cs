@@ -16,7 +16,6 @@ namespace DGrabowski_MephistoTheatreApp.Models
     // You can add profile data for the user by adding more properties to your User class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public abstract class User : IdentityUser
     {
-
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
@@ -34,18 +33,29 @@ namespace DGrabowski_MephistoTheatreApp.Models
         private UserManager userManager;
 
 
-        //the CurrentRole property is not mapped as a field in the users table
-        //i need it to get the current role that the user is logged in
         [NotMapped]
         public string CurrentRole
         {
             get
             {
-                if (userManager == null)
+                var userManager = HttpContext.Current.GetOwinContext().GetUserManager<UserManager>();
+
+                // Check if the user has any roles before calling Single
+                var roles = userManager.GetRoles(Id);
+                if (roles.Any())
                 {
-                    userManager = HttpContext.Current.GetOwinContext().GetUserManager<UserManager>();
+                    // If the user has roles, return the first role (or adjust as needed)
+                    return roles.Single();
                 }
-                return userManager.GetRoles(Id).Single();
+
+                // Handle the case where the user has no roles
+                return "Member";
+            }
+            set 
+            {
+                var userManager = HttpContext.Current.GetOwinContext().GetUserManager<UserManager>();
+                userManager.RemoveFromRoles(Id, userManager.GetRoles(Id).ToArray());
+                userManager.AddToRole(Id, value);
             }
         }
 

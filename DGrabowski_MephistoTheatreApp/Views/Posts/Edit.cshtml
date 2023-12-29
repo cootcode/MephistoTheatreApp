@@ -1,0 +1,88 @@
+﻿@model DGrabowski_MephistoTheatreApp.Models.Post
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "Posts", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+{
+    @Html.HiddenFor(model => model.PostId)
+
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Title, new { @class = "form-label" })
+        @Html.EditorFor(model => model.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(model => model.CategoryId, new { @class = "form-label" })
+        @Html.DropDownList("CategoryId", null, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(model => model.Body, new { @class = "form-label" })
+        <div id="editor" style="height: 300px;">@Html.Raw(Model.Body)</div> <!-- Populate existing content -->
+        @Html.TextAreaFor(model => model.Body, new { @class = "form-control d-none", @id = "hidden-editor" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(model => model.IsPublished, new { @class = "form-label" })
+        <div class="form-check">
+            @Html.CheckBoxFor(model => model.IsPublished, new { @class = "form-check-input" })
+            @Html.LabelFor(model => model.IsPublished, new { @class = "form-check-label" })
+        </div>
+        @Html.ValidationMessageFor(model => model.IsPublished, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(model => model.IsDraft, new { @class = "form-label" })
+        <div class="form-check">
+            @Html.CheckBoxFor(model => model.IsDraft, new { @class = "form-check-input" })
+            @Html.LabelFor(model => model.IsDraft, new { @class = "form-check-label" })
+        </div>
+        @Html.ValidationMessageFor(model => model.IsDraft, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(model => model.IsArchived, new { @class = "form-label" })
+        <div class="form-check">
+            @Html.CheckBoxFor(model => model.IsArchived, new { @class = "form-check-input" })
+            @Html.LabelFor(model => model.IsArchived, new { @class = "form-check-label" })
+        </div>
+        @Html.ValidationMessageFor(model => model.IsArchived, "", new { @class = "text-danger" })
+    </div>
+
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <input type="submit" value="Save Changes" class="btn btn-primary" />
+    </div>
+}
+
+@section Scripts {
+    <!-- Include Quill.js -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <!-- Include Quill's theme (optional) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <script>
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            placeholder: 'Write your post here...',
+        });
+
+        // Set initial content
+        quill.clipboard.dangerouslyPasteHTML('@Html.Raw(Model.Body)');
+
+        quill.on('text-change', function () {
+            var htmlContent = quill.root.innerHTML;
+            document.getElementById('hidden-editor').value = htmlContent;
+        });
+
+        // Ensure the hidden input is updated before form submission
+        $('form').submit(function () {
+            quill.update();
+        });
+    </script>
+}

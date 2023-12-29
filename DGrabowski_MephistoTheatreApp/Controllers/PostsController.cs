@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
 {
     public class PostsController : Controller
     {
-        private MephistoTheatreDbContext db = new MephistoTheatreDbContext();
+        private readonly MephistoTheatreDbContext db = new MephistoTheatreDbContext();
 
         public PostsController()
         {
@@ -36,33 +37,63 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 .Include(p => p.Category)
                 .Include(p => p.Staff)
                 .Include(p => p.Comments)
-                .AsQueryable();
+                .ToList();  // Materialize the query to avoid potential EF issues
 
             if (!string.IsNullOrEmpty(category))
             {
-                posts = posts.Where(p => p.Category.CategoryName == category);
+                posts = posts.Where(p => p.Category.CategoryName == category).ToList();
             }
 
             switch (sortBy)
             {
                 case "Date":
-                    posts = posts.OrderByDescending(p => p.CreatedAt);
+                    posts = posts.OrderByDescending(p => p.CreatedAt).ToList();
                     break;
                 case "Author":
-                    posts = posts.OrderBy(p => p.Staff.FirstName).ThenBy(p => p.Staff.LastName);
+                    posts = posts.OrderBy(p => p.Staff.FirstName).ThenBy(p => p.Staff.LastName).ToList();
                     break;
                 case "Popularity":
-                    // Implement popularity sorting logic
+                    posts = posts.OrderByDescending(p => p.CommentsCount).ToList();
                     break;
                 default:
-                    posts = posts.OrderByDescending(p => p.CreatedAt);
+                    posts = posts.OrderByDescending(p => p.CreatedAt).ToList();
                     break;
             }
 
             var pagedPosts = posts.ToPagedList(page ?? 1, pageSize);
 
-
             return View(pagedPosts);
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult ListOfAllPosts()
+        {
+            var allPosts = db.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Staff)
+                .Include(p => p.Comments)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToList();
+
+            return View(allPosts);
+        }
+        [Authorize(Roles = "Admin")]
+        public ActionResult DetailsOfPost(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Post post = db.Posts.Find(id);
+
+            if (post == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(post);
         }
 
         public ActionResult GetComments(int postId)
@@ -108,7 +139,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 .Where(c => c.PostId == postId).ToList();
             var commentsHtml = RenderPartialViewToString("_Comments", comments);
 
-            return Json(new { success = true, html = commentsHtml });
+            return Json(new { success = true, html = commentsHtml, message = "Comment submitted successfully!" });
         }
 
         [HttpPost]
@@ -118,7 +149,13 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             try
             {
                 var userId = User.Identity.GetUserId();
+                var user = db.Users.SingleOrDefault(u => u.Id == userId);
                 var existingComment = db.Comments.Find(commentId);
+
+                if (user == null || user.IsSuspended)
+                {
+                    return Json(new { success = false, message = user == null ? "User not found." : "Your account is suspended. You cannot submit comments." });
+                }
 
                 var newSubComment = new SubComment
                 {
@@ -141,7 +178,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                     .ToList();
 
                 var commentsHtml = RenderPartialViewToString("_Comments", comments);
-                return Json(new { success = true, html = commentsHtml });
+                return Json(new { success = true, html = commentsHtml, message = "Comment submitted successfully!"  });
             }
             catch (Exception ex)
             {
@@ -195,7 +232,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
 
             return View(post);
         }
-
+        [Authorize(Roles = "Staff,Admin")]
         // GET: Posts/Create
         public ActionResult Create()
         {
@@ -205,17 +242,51 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         }
 
         // POST: Posts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff,Admin")]
         public ActionResult Create([Bind(Include = "PostId,Title,CreatedAt,Body,IsPublished,IsArchived,LastEditAt,IsDraft,StaffId,CategoryId")] Post post)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Posts.Add(post);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    string userId = User.Identity.GetUserId();
+
+                    post.StaffId = userId;
+
+                    post.CreatedAt = DateTime.Now;
+                    post.IsArchived = false;
+                    post.IsDraft = false;
+
+                    db.Posts.Add(post);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details or inspect them during debugging
+                var innerException = ex.InnerException;
+                while (innerException != null)
+                {
+                    // Log or inspect inner exception details
+                    innerException = innerException.InnerException;
+                }
+
+
+                // handle unique constraint violations
+                if (ex.InnerException is System.Data.SqlClient.SqlException sqlException &&
+                    (sqlException.Number == 2601 || sqlException.Number == 2627))
+                {
+                    // Handle unique constraint violation
+                    ModelState.AddModelError("Title", "A post with this title already exists.");
+                }
+                else
+                {
+                    // Rethrow the exception if it's not the type you are handling
+                    throw;
+                }
             }
 
             ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "CategoryName", post.CategoryId);
@@ -224,6 +295,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         }
 
         // GET: Posts/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -244,21 +316,54 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "PostId,Title,CreatedAt,Body,IsPublished,IsArchived,LastEditAt,IsDraft,StaffId,CategoryId")] Post post)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Entry(post).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    // Retrieve the current post from the database
+                    var existingPost = db.Posts.Find(post.PostId);
+
+                    if (existingPost == null)
+                    {
+                        return HttpNotFound();
+                    }
+
+                        // Update the properties of the existing post with the new values
+                        existingPost.Title = post.Title;
+                        existingPost.Body = post.Body;
+                        existingPost.IsPublished = post.IsPublished;
+                        existingPost.IsArchived = post.IsArchived;
+                        existingPost.IsDraft = post.IsDraft;
+                        existingPost.LastEditAt = DateTime.Now; // Update the LastEditAt timestamp
+
+                        // Set the EntityState to Modified and save changes
+                        db.Entry(existingPost).State = EntityState.Modified;
+                        db.SaveChanges();
+
+                        return RedirectToAction("Index");
+                }
+
+                ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "CategoryName", post.CategoryId);
+                ViewBag.StaffId = new SelectList(db.Users, "Id", "FirstName", post.StaffId);
+                return View(post);
             }
+            catch (Exception ex)
+            {
+                // Handle exceptions, log, or display an error message
+                ModelState.AddModelError(string.Empty, "An error occurred while saving the changes.");
+            }
+
             ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "CategoryName", post.CategoryId);
             ViewBag.StaffId = new SelectList(db.Users, "Id", "FirstName", post.StaffId);
             return View(post);
         }
 
         // GET: Posts/Delete/5
+        [Authorize(Roles = "Staff,Admin")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -275,6 +380,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
 
         // POST: Posts/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Staff,Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {

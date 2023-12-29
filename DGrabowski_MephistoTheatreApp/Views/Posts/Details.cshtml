@@ -159,6 +159,7 @@
                     // If successful, update the comments container
                     $('#comments-container').html(data.html);
                     // Optionally, clear the comment textarea after submission
+                    alert("Comment submitted successfully!");
                     $('#comment-text').val('');
                 } else {
                     // If unsuccessful, display the error message
@@ -196,6 +197,7 @@
                             // If successful, update the comments container
                             $('#comments-container').html(data.html);
                             // clear the reply textarea after submission
+                            alert("Comment submitted successfully!");
                             $('#reply-text-' + commentId).val('');
                         } else {
                             // If unsuccessful, display the error message

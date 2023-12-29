@@ -12,7 +12,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
 {
     public class CommentsController : Controller
     {
-        private MephistoTheatreDbContext db = new MephistoTheatreDbContext();
+        private readonly MephistoTheatreDbContext db = new MephistoTheatreDbContext();
 
         // GET: Comments
         public ActionResult Index()
@@ -20,12 +20,15 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             var comments = db.Comments
                 .Include(c => c.SubComments)
                 .Include(c => c.Post)
-                .Include(c => c.User);
-            return View(comments.ToList());
+                .Include(c => c.User)
+                .ToList();
+
+            return View(comments);
         }
 
+
         [HttpPost]
-        public ActionResult PublishUnpublishComment(int commentId, string commentAction)
+        public ActionResult PublishUnpublishComment(int commentId)
         {
             var comment = db.Comments.Find(commentId);
 
@@ -33,7 +36,17 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             {
                 // Toggle the IsPublished property
                 comment.IsPublished = !comment.IsPublished;
+
+                // Update the subcomments' IsPublished property
+                foreach (var subComment in comment.SubComments)
+                {
+                    subComment.IsPublished = comment.IsPublished;
+                }
+
+                // Save the changes to the database
                 db.SaveChanges();
+
+                // Redirect to the Index action or any other appropriate action
                 return RedirectToAction("Index");
             }
             else
@@ -44,20 +57,24 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult PublishUnpublishSubComment(int subCommentId, string commentAction)
+        public ActionResult PublishUnpublishSubComment(int subCommentId)
         {
             var subComment = db.SubComments.Find(subCommentId);
 
             if (subComment != null)
             {
-                // Toggle the IsPublished property for the sub-comment
+                // Toggle the IsPublished property
                 subComment.IsPublished = !subComment.IsPublished;
+
+                // Save the changes to the database
                 db.SaveChanges();
+
+                // Return the Index view with the updated data
                 return RedirectToAction("Index");
             }
             else
             {
-                // Sub-comment not found
+                // SubComment not found
                 return HttpNotFound();
             }
         }
@@ -100,7 +117,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body", comment.ParentCommentId);
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body");
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title", comment.PostId);
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", comment.UserId);
             return View(comment);
@@ -118,7 +135,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body", comment.ParentCommentId);
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body");
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title", comment.PostId);
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", comment.UserId);
             return View(comment);
@@ -137,36 +154,59 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body", comment.ParentCommentId);
+            ViewBag.ParentCommentId = new SelectList(db.Comments, "CommentId", "Body");
             ViewBag.PostId = new SelectList(db.Posts, "PostId", "Title", comment.PostId);
             ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", comment.UserId);
             return View(comment);
         }
 
-        // GET: Comments/Delete/5
-        public ActionResult Delete(int? id)
+        // POST: Comments/Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteComment(int commentId)
         {
-            if (id == null)
+            Comment comment = db.Comments.Find(commentId);
+
+            if (comment != null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                // Remove the comment from the database
+                db.Comments.Remove(comment);
+
+                // Save the changes to the database
+                db.SaveChanges();
+
+                // Redirect to the Index action or any other appropriate action
+                return RedirectToAction("Index");
             }
-            Comment comment = db.Comments.Find(id);
-            if (comment == null)
+            else
             {
+                // Comment not found
                 return HttpNotFound();
             }
-            return View(comment);
         }
 
-        // POST: Comments/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteSubComment(int subCommentId)
         {
-            Comment comment = db.Comments.Find(id);
-            db.Comments.Remove(comment);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            SubComment subComment = db.SubComments.Find(subCommentId);
+
+            if (subComment != null)
+            {
+                // Remove the subcomment from the database
+                db.SubComments.Remove(subComment);
+
+                // Save the changes to the database
+                db.SaveChanges();
+
+                // Redirect to the Index action or any other appropriate action
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                // SubComment not found
+                return HttpNotFound();
+            }
         }
 
         protected override void Dispose(bool disposing)

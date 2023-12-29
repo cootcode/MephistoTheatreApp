@@ -11,6 +11,16 @@
                 <h4>User Details</h4>
 
                 <dl class="dl-horizontal">
+                    <dt>Account Status:</dt>
+                    @if (Model.IsSuspended == true)
+                    {
+                        <div class="link-danger"><dd>Account Suspended</dd></div>
+                        
+                    }
+                    else
+                    {
+                        <div class="link-success"><dd>Active</dd></div>
+                    }
                     <dt>User Role:</dt>
                     <dd>@Model.Role</dd>
                     <dt>User name:</dt>
@@ -36,9 +46,6 @@
 
                     <!-- Change Password button -->
                     <a href="@Url.Action("ChangePassword")" class="btn btn-secondary">Change Password</a>
-
-                    <!-- View Comments button -->
-                    <a href="@Url.Action("ViewComments")" class="btn btn-info">View Comments</a>
 
                     <!-- Delete Account button -->
                     <button type="button" class="btn btn-danger" id="deleteAccountBtn" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete Account</button>

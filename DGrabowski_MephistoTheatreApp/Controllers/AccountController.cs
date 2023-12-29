@@ -152,17 +152,18 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             if (ModelState.IsValid)
             {
                 var user = new Member {
-                    UserName = model.UserName,
+                    Email = model.Email,
+                    UserName = model.Email,
                     FirstName = model.Firstname,
                     LastName = model.Lastname,
                     Street = model.Street,
                     City = model.City,
                     PostCode = model.Postcode,
-                    Email = model.Email,
                     //record the data and time when the user registered.
                     RegisteredAt = DateTime.Now,
                     //when user registers is not suspended
                     IsSuspended = false
+                    
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)

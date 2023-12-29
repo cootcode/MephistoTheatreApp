@@ -3,10 +3,14 @@
     ViewBag.Title = "Admin Dashboard";
 }
 
-<h2>@ViewBag.Title</h2>
+<h2 class="text-center">@ViewBag.Title</h2>
 
-<div class="btn-group">
-    @Html.ActionLink("Manage Users", "ManageUsers", "Admin", null, new { @class = "btn btn-primary btn-lg" })
-    @Html.ActionLink("Manage Categories", "ManageCategories", "Admin", null, new { @class = "btn btn-primary btn-lg" })
-    @Html.ActionLink("Manage Posts", "ManagePosts", "Admin", null, new { @class = "btn btn-primary btn-lg" })
+<div class="text-center my-4">
+    <div class="btn-group">
+        @Html.ActionLink("Manage Users", "Index", "Users", null, new { @class = "btn btn-primary btn-lg mx-2" })
+        @Html.ActionLink("Manage Categories", "Index", "Categories", null, new { @class = "btn btn-primary btn-lg mx-2" })
+        @Html.ActionLink("Manage Posts", "ListOfAllPosts", "Posts", null, new { @class = "btn btn-primary btn-lg mx-2" })
+        @Html.ActionLink("Manage Comments", "Index", "Comments", null, new { @class = "btn btn-primary btn-lg mx-2" })
+        @Html.ActionLink("Create a Post", "Create", "Posts", null, new { @class = "btn btn-primary btn-lg mx-2" })
+    </div>
 </div>

@@ -27,6 +27,13 @@
                     @if (User.IsInRole("Admin"))
                     {
                         <li>@Html.ActionLink("Admin", "Index", "Admin", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Comment Moderation", "Index", "Comments", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Create a post", "Create", "Posts", null, new { @class = "nav-link" })</li>
+                    }
+                    @if (User.IsInRole("Staff"))
+                    {
+                        <li>@Html.ActionLink("Comment Moderation", "Index", "Comments", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Create a post", "Create", "Posts", null, new { @class = "nav-link" })</li>
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")

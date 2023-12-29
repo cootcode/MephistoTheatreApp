@@ -21,7 +21,7 @@ namespace DGrabowski_MephistoTheatreApp.Models
 
         [ForeignKey("Comment")]
         public int CommentId { get; set; }
-        public Comment Comment { get; set; }
-        public List<SubComment> SubCommentReplies { get; set; }
+        public virtual Comment Comment { get; set; }
+
     }
 }

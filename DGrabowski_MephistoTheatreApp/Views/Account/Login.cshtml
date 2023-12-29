@@ -33,9 +33,13 @@
                             @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
                             @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                         </div>
+
                     </div>
                     <div class="form-group row pb-2">
                         <div class="offset-md-2 col-md-10">
+                            <p>
+                                @Html.ActionLink("Register as a new user", "Register")
+                            </p>
                             <div class="checkbox">
                                 @Html.CheckBoxFor(m => m.RememberMe)
                                 @Html.LabelFor(m => m.RememberMe)
@@ -47,9 +51,7 @@
                             <input type="submit" value="Log in" class="btn btn-outline-dark" />
                         </div>
                     </div>
-                    <p>
-                        @Html.ActionLink("Register as a new user", "Register")
-                    </p>
+
             @* Enable this once you have account confirmation enabled for password reset functionality
             <p>
                 @Html.ActionLink("Forgot your password?", "ForgotPassword")

@@ -27,7 +27,7 @@
             <div id="posts-container" class="row">
                 @foreach (var post in Model)
                 {
-                    @Html.Partial("_PostPartial", post)
+                        @Html.Partial("_PostPartial", post)
                 }
             </div>
             <!-- Pagination-->
@@ -58,6 +58,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
+                                <li>@Html.ActionLink("No Filter", "Index")</li>
                                 <li><a href="javascript:void(0);" class="category-link" data-category="Announcements">Announcements</a></li>
                                 <li><a href="javascript:void(0);" class="category-link" data-category="Movie Posts">Movie Posts</a></li>
                                 <li><a href="javascript:void(0);" class="category-link" data-category="Reviews">Reviews</a></li>
@@ -73,6 +74,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
+                                <li>@Html.ActionLink("No Filter", "Index")</li>
                                 <li><a href="javascript:void(0);" class="sort-link" data-sort="Date" data-category="@ViewBag.Category">Date</a></li>
                                 <li><a href="javascript:void(0);" class="sort-link" data-sort="Author" data-category="@ViewBag.Category">Author</a></li>
                                 <li><a href="javascript:void(0);" class="sort-link" data-sort="Popularity" data-category="@ViewBag.Category">Popularity</a></li>

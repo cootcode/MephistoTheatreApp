@@ -20,6 +20,7 @@ namespace DGrabowski_MephistoTheatreApp.Models
             SeedMembers(context);
             SeedPosts(context);
             SeedComments(context);
+            SeedSubComments(context);
 
             context.SaveChanges();
         }
@@ -482,29 +483,69 @@ namespace DGrabowski_MephistoTheatreApp.Models
             foreach (var post in posts)
             {
                 var comments = new List<Comment>
-        {
-            new Comment
-            {
-                TimeStamp = DateTime.Now,
-                Body = "This is the first comment on the post.",
-                IsDraft = false,
-                IsPublished = true,
-                UserId = userIdForComments,
-                PostId = post.PostId, // Use the current post's ID
-            },
-            new Comment
-            {
-                TimeStamp = DateTime.Now,
-                Body = "This is the second comment on the post.",
-                IsDraft = false,
-                IsPublished = true,
-                UserId = userIdForComments,
-                PostId = post.PostId, // Use the current post's ID
-            },
-            // You can add more comments here if needed
-        };
+                {
+                    new Comment
+                    {
+                        TimeStamp = DateTime.Now,
+                        Body = "This is the first comment on the post.",
+                        IsDraft = false,
+                        IsPublished = true,
+                        UserId = userIdForComments,
+                        PostId = post.PostId, // Use the current post's ID
+                    },
+                    new Comment
+                    {
+                        TimeStamp = DateTime.Now,
+                        Body = "This is the second comment on the post.",
+                        IsDraft = false,
+                        IsPublished = true,
+                        UserId = userIdForComments,
+                        PostId = post.PostId, // Use the current post's ID
+                    },
+                    // You can add more comments here if needed
+                };
 
                 comments.ForEach(c => context.Comments.AddOrUpdate(comment => comment.Body, c));
+            }
+
+            context.SaveChanges();
+        }
+
+        private void SeedSubComments(MephistoTheatreDbContext context)
+        {
+            var comments = context.Comments.ToList(); // Retrieve all comments
+            var userIdForSubComments = context.Users.OrderBy(u => u.Id).Select(u => u.Id).FirstOrDefault();
+
+            foreach (var comment in comments)
+            {
+                // Create subcomments for the first two comments of each post
+                if (comment.Post != null && comment.Post.Comments != null && comment.Post.Comments.Count >= 2)
+                {
+                    var subComments = new List<SubComment>
+                    {
+                        new SubComment
+                        {
+                            TimeStamp = DateTime.Now,
+                            Body = "This is a subcomment for the first comment.",
+                            IsDraft = false,
+                            IsPublished = true,
+                            UserId = userIdForSubComments,
+                            CommentId = comment.Post.Comments.First().CommentId, // Use the first comment's ID
+                        },
+                        new SubComment
+                        {
+                            TimeStamp = DateTime.Now,
+                            Body = "This is a subcomment for the second comment.",
+                            IsDraft = false,
+                            IsPublished = true,
+                            UserId = userIdForSubComments,
+                            CommentId = comment.Post.Comments.Skip(1).First().CommentId, // Use the second comment's ID
+                        },
+                        // You can add more subcomments here if needed
+                    };
+
+                    subComments.ForEach(sc => context.SubComments.AddOrUpdate(subComment => subComment.Body, sc));
+                }
             }
 
             context.SaveChanges();

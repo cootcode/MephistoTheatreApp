@@ -1,0 +1,102 @@
+﻿@model IEnumerable<DGrabowski_MephistoTheatreApp.Models.Post>
+
+@{
+    ViewBag.Title = "ListOfAllPosts";
+}
+
+<h2>ListOfAllPosts</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Category.CategoryName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Staff.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Body)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsPublished)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsArchived)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastEditAt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsDraft)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Category.CategoryName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Staff.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedAt)
+        </td>
+        <td>
+            @{
+                int maxSymbolsPerRow = 20;
+                int maxTotalSymbols = 100;
+
+                // Truncate to a maximum of 100 symbols
+                string truncatedText = item.Body.Length > maxTotalSymbols
+                    ? item.Body.Substring(0, maxTotalSymbols) + "..."
+                    : item.Body;
+
+                // Calculate the number of rows needed based on the maximum symbols per row
+                int rows = (int)Math.Ceiling((double)truncatedText.Length / maxSymbolsPerRow);
+
+                // Display the truncated text across multiple rows
+                for (int i = 0; i < rows; i++)
+                {
+                    int startIndex = i * maxSymbolsPerRow;
+                    int length = Math.Min(maxSymbolsPerRow, truncatedText.Length - startIndex);
+
+                    string rowText = truncatedText.Substring(startIndex, length);
+                    <div>@Html.Raw(rowText)</div>
+                }
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsPublished)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsArchived)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LastEditAt)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDraft)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.PostId }) |
+            @Html.ActionLink("Details", "DetailsOfPost", new { id = item.PostId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.PostId })
+        </td>
+    </tr>
+}
+
+</table>

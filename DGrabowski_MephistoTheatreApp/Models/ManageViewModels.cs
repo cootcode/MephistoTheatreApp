@@ -22,7 +22,7 @@ namespace DGrabowski_MephistoTheatreApp.Models
         public string City { get; set; }
         public string Postcode { get; set; }
         public string Role { get; set; }
-
+        public bool IsSuspended { get; set; }
     }
 
     public class ManageLoginsViewModel

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -10,6 +11,7 @@ using DGrabowski_MephistoTheatreApp.Models;
 
 namespace DGrabowski_MephistoTheatreApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private MephistoTheatreDbContext db = new MephistoTheatreDbContext();
@@ -46,15 +48,27 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CategoryId,CategoryName")] Category category)
+        public ActionResult Create(Category category)
         {
             if (ModelState.IsValid)
             {
+                // Handle file upload
+                if (category.ImageFile != null && category.ImageFile.ContentLength > 0)
+                {
+                    var fileName = Path.GetFileName(category.ImageFile.FileName);
+                    var filePath = Path.Combine(Server.MapPath("~/Images"), fileName);
+                    category.ImageFile.SaveAs(filePath);
+                    category.ImagePath = "/Images/" + fileName; // Update the image path in the model
+                }
+
+                // Save the category to the database
                 db.Categories.Add(category);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 
+            // If ModelState is not valid, return to the view with validation errors
             return View(category);
         }
 

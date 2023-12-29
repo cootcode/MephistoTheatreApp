@@ -76,6 +76,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
 
 
                 // Additional user details
+                IsSuspended = user.IsSuspended,
                 Role = user.CurrentRole,
                 UserName = user.UserName,
                 Firstname = user.FirstName,
@@ -83,7 +84,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
                 Street = user.Street,
                 City = user.City,
                 Postcode = user.PostCode,
-                Email = user.Email,
+                Email = user.Email
             };
             return View(model);
         }
