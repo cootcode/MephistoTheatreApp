@@ -20,14 +20,14 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
         private readonly UserManager<User> _userManager;
 
         // GET: Users
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Staff")]
         public ActionResult Index()
         {
             return View(db.Users.ToList());
         }
 
         // GET: Users/Details/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Staff")]
         public ActionResult Details(string id)
         {
             if (id == null)
@@ -144,7 +144,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin")]
         public ActionResult PromoteToStaff(string id)
         {
 
@@ -161,7 +161,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             // Redirect or return a view accordingly
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin,Staff")]
         public ActionResult DemoteToMember(string id)
         {
 
@@ -178,6 +178,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             // Redirect or return a view accordingly
             return RedirectToAction("Index");
         }
+        [Authorize(Roles = "Admin,Staff")]
         public ActionResult SuspendUser(string id)
         {
             var user = db.Users.Find(id);
@@ -193,7 +194,7 @@ namespace DGrabowski_MephistoTheatreApp.Controllers
             // Redirect or return a view accordingly
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin,Staff")]
         public ActionResult ActivateUser(string id)
         {
             var user = db.Users.Find(id);

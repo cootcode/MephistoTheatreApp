@@ -19,5 +19,28 @@ namespace DGrabowski_MephistoTheatreApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            // Transfer the user to the appropriate custom error page
+            HttpException lastErrorWrapper = Server.GetLastError() as HttpException;
+
+            if (lastErrorWrapper.GetHttpCode() == 404)
+            {
+                Server.TransferRequest("~/Error/NotFound");
+            }
+            else if (lastErrorWrapper.GetHttpCode() == 500)
+            {
+                Server.TransferRequest("~/Error/InternalErrorServer");
+            }
+            else if (lastErrorWrapper.GetHttpCode() == 403)
+            {
+                Server.TransferRequest("~/Error/Forbidden");
+            }
+            else
+            {
+                Server.TransferRequest("~/Error/Unauthorized");
+            }
+        }
     }
 }

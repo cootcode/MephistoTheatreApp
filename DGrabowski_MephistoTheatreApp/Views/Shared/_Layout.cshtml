@@ -33,6 +33,7 @@
                     @if (User.IsInRole("Staff"))
                     {
                         <li>@Html.ActionLink("Comment Moderation", "Index", "Comments", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("User Management", "Index", "Users", null, new { @class = "nav-link" })</li>
                         <li>@Html.ActionLink("Create a post", "Create", "Posts", null, new { @class = "nav-link" })</li>
                     }
                 </ul>

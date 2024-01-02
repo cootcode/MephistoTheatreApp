@@ -6,10 +6,12 @@
 
 <div class="container">
     <h2>User Management - List of All Users</h2>
-
-    <p>
-        @Html.ActionLink("Back To Admin Panel", "Index", "Admin", new { @class = "btn btn-primary" })
-    </p>
+    @if (User.IsInRole("Admin"))
+    { 
+        <p>
+            @Html.ActionLink("Back To Admin Panel", "Index", "Admin")
+        </p>
+    }
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -54,18 +56,32 @@
                             @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-info" })
                             @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
 
-                            @if (item.CurrentRole == "Member")
+                            @if (User.IsInRole("Admin"))
                             {
-                                @Html.ActionLink("Promote to Staff", "PromoteToStaff", new { id = item.Id }, new { @class = "btn btn-success" })
+                                if (item.CurrentRole == "Member")
+                                {
+                                    @Html.ActionLink("Promote to Staff", "PromoteToStaff", new { id = item.Id }, new { @class = "btn btn-success" })
+                                }
+                                else if (item.CurrentRole == "Staff")
+                                {
+                                    @Html.ActionLink("Demote to Member", "DemoteToMember", new { id = item.Id }, new { @class = "btn btn-secondary" })
+                                }
+                                @Html.ActionLink(item.IsSuspended ? "Activate" : "Suspend",
+                                                      item.IsSuspended ? "ActivateUser" : "SuspendUser",
+                                                      new { id = item.Id },
+                                                      new { @class = item.IsSuspended ? "btn btn-success" : "btn btn-warning" })
                             }
-                            else if (item.CurrentRole == "Staff")
+                            @if (User.IsInRole("Staff"))
                             {
-                                @Html.ActionLink("Demote to Member", "DemoteToMember", new { id = item.Id }, new { @class = "btn btn-secondary" })
+                                if (item.CurrentRole == "Member")
+                                {
+                                    @Html.ActionLink("Promote to Staff", "PromoteToStaff", new { id = item.Id }, new { @class = "btn btn-success" })
+                                }
+                                @Html.ActionLink(item.IsSuspended ? "Activate" : "Suspend",
+                                                      item.IsSuspended ? "ActivateUser" : "SuspendUser",
+                                                      new { id = item.Id },
+                                                      new { @class = item.IsSuspended ? "btn btn-success" : "btn btn-warning" })
                             }
-                            @Html.ActionLink(item.IsSuspended ? "Activate" : "Suspend",
-                                             item.IsSuspended ? "ActivateUser" : "SuspendUser",
-                                             new { id = item.Id },
-                                             new { @class = item.IsSuspended ? "btn btn-success" : "btn btn-warning" })
                         </div>
                     </td>
                 </tr>
