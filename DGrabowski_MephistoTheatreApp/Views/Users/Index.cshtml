@@ -52,9 +52,9 @@
                     <td>@Html.DisplayFor(modelItem => item.UserName)</td>
                     <td>
                         <div class="btn-group" role="group" aria-label="User Actions">
-                            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+
                             @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-info" })
-                            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+
 
                             @if (User.IsInRole("Admin"))
                             {
@@ -66,6 +66,8 @@
                                 {
                                     @Html.ActionLink("Demote to Member", "DemoteToMember", new { id = item.Id }, new { @class = "btn btn-secondary" })
                                 }
+                                @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
                                 @Html.ActionLink(item.IsSuspended ? "Activate" : "Suspend",
                                                       item.IsSuspended ? "ActivateUser" : "SuspendUser",
                                                       new { id = item.Id },
